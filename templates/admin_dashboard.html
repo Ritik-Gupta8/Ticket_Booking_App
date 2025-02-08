@@ -1,0 +1,39 @@
+{%extends "admin_layout.html"%} <!--Inherited all features-->
+{%block content%}
+                <div class="container">
+                    {%if theatres%}
+                    <div class="row">
+                        {%for theatre in theatres%}
+                        <div class="col">
+                        <!-- venue 1 card here -->
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                              <h5 class="card-title"><a href="#">{{theatre.name}}</a></h5>
+                              <h6 class="card-subtitle mb-2 text-muted">{{theatre.location}}</h6>
+                                {%if theatre.shows%}
+                                    <table>
+                                        <tr><th>ID</th><th>Name</th><th>Date and Time</th></tr>
+                                        {%for show in theatre.shows%}
+                                            <tr><td><a href="#">{{show.id}}</a></td><td>{{show.name}}</td><td>{{show.date_time}}</td></tr>
+                                        {%endfor%}
+                                    </table>                                       
+                                {%else%}
+                                    <p>No, shows here!</p>
+                                {%endif%}
+                              <a href="/show/{{theatre.id}}/{{name}}" class="btn btn-outline-primary">+Add Show</a>
+                            </div>
+                        </div>
+                        <!-- End of venue -->
+                        </div>
+                        {%endfor%}           
+                    </div>
+                    {%else%}
+                        <h3 class="center">No Venues are available</h3>
+                    {%endif%}
+                </div>
+                <div class="center">
+                    <a href="/venue/{{name}}" type="button" class="btn btn-primary">+Add Venue</a></button>
+                </div>  
+
+{%endblock%}
+   
