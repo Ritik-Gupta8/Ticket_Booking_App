@@ -4,8 +4,10 @@ from .models import *
 from flask import current_app as app
 from datetime import datetime
 from sqlalchemy import func 
-
-
+from werkzeug.utils import secure_filename
+import matplotlib  ### first line  - I added those two lones from chatgpt      toa void error mainthread
+matplotlib.use('Agg')   #second line
+import matplotlib.pyplot as plt
 
 @app.route("/")
 def home():
@@ -74,7 +76,13 @@ def add_venue(name):
         location=request.form.get("location")
         pincode=request.form.get("pincode")
         capacity=request.form.get("capacity")
-        new_theatre=Theatre(name=vname,location=location,pincode=pincode,capacity=capacity)
+        file=request.files["file_upload"]
+        url=""
+        if file.filename:
+            file_name=secure_filename(file.filename) # verification of the file is done
+            url='./uploaded_files/' +vname+"_"+file_name
+            file.save(url)
+        new_theatre=Theatre(name=vname,location=location,pincode=pincode,capacity=capacity,venue_pic_url=url)
         db.session.add(new_theatre)
         db.session.commit()
         return redirect(url_for("admin_dashboard",name=name))
@@ -175,9 +183,18 @@ def book_ticket(uid,sid,name):
     # Booked Tickets by aggregate functions sum
     book_tickets=Ticket.query.with_entities(func.sum(Ticket.no_of_tickets)).group_by(Ticket.show_id).filter_by(show_id=sid).first()
     if book_tickets:
-        available_seats -= book_tickets[0]
+        available_seats -= book_tickets[0] 
 
     return render_template("book_ticket.html",uid=uid,sid=sid,name=name,tname=theatre.name,sname=show.name,available_seats=available_seats,tktprice=show.tkt_price)
+
+@app.route("/admin_summary")
+def admin_summary():
+    plot=get_theatres_summary()
+    plot.savefig("./static/images/theatre_summary.jpeg")
+    plot.clf()
+    return render_template("admin_summary.html")
+
+
 
 #Other supportedd function
 def get_theatres():
@@ -199,3 +216,17 @@ def get_venue(id):
 def get_show(id):
     show=Show.query.filter_by(id=id).first()
     return show
+
+def get_theatres_summary():
+    theatres=get_theatres()
+    summary={}
+    for t in theatres:
+        summary[t.name]=t.capacity
+    x_names=list(summary.keys())
+    y_capacities=list(summary.values())
+    plt.bar(x_names,y_capacities,color="blue",width=0.4)
+    plt.title("Theatres/Capacities")
+    plt.xlabel("Theatre")
+    plt.ylabel("Capacity")
+    return plt
+
