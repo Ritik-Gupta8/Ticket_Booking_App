@@ -15,7 +15,7 @@ def setup_app():
     print("Ticker show app is started..")
 
 #call th funnction
-setup_app()
+setup_app()  
 
 from backend.controllers import *
 
