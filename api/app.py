@@ -7,9 +7,9 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Create Flask app
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates", static_folder="../static")
 
-# Database configuration
+# Database configuration - using SQLite in memory for Vercel
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -17,13 +17,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 from backend.models import db
 db.init_app(app)
 
+# Create tables - important for in-memory SQLite
+with app.app_context():
+    db.create_all()
+
 # Import controllers AFTER app creation
 from backend.controllers import *
-
-# Test route
-@app.route('/')
-def home():
-    return jsonify({"status": "ok", "message": "Server is running"})
 
 # Vercel requires this specific WSGI setup
 application = DispatcherMiddleware(app)
