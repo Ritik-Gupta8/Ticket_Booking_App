@@ -2,7 +2,7 @@
 from flask import Flask
 from backend.models import db
 from backend.api_controllers import *
-from vercel_wsgi import handle_request
+
 
 app=None
 
@@ -26,7 +26,7 @@ def ping():
 
 # Required for Vercel
 def handler(environ, start_response):
-    return handle_request(app, environ, start_response)
+    return app(environ, start_response)
 
 if __name__ =="__main__":
     app.run()

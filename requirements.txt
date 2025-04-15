@@ -1,5 +1,5 @@
-flask
-vercel-wsgi
-flask_sqlalchemy
-werkzeug
-matplotlib
+Flask==2.0.1
+vercel-wsgi==0.4.0
+Flask-SQLAlchemy==2.5.1
+Werkzeug==2.0.1
+matplotlib==3.4.2
