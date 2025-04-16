@@ -1,3 +1,6 @@
+import os
+os.environ['MPLCONFIGDIR'] = '/tmp/matplotlib'  # Set writable cache dir
+
 from flask import Flask
 from backend.models import db
 

@@ -190,12 +190,11 @@ def register_routes(app):
 
         return render_template("book_ticket.html",uid=uid,sid=sid,name=name,tname=theatre.name,sname=show.name,available_seats=available_seats,tktprice=show.tkt_price)
 
-    @app.route("/admin_summary")
+    @app.route('/admin_summary')
     def admin_summary():
-        plot=get_theatres_summary()
-        plot.savefig("./static/images/theatre_summary.jpeg")
-        plot.clf()
-        return render_template("admin_summary.html")
+        get_theatres_summary()  # ✅ no need to store return value or call savefig again
+        return render_template('admin_summary.html')
+
 
 
 
@@ -219,16 +218,27 @@ def register_routes(app):
     def get_show(id):
         show=Show.query.filter_by(id=id).first()
         return show
+    
 
+    import os
     def get_theatres_summary():
-        theatres=get_theatres()
-        summary={}
-        for t in theatres:
-            summary[t.name]=t.capacity
-        x_names=list(summary.keys())
-        y_capacities=list(summary.values())
-        plt.bar(x_names,y_capacities,color="blue",width=0.4)
+        theatres = get_theatres()
+        summary = {t.name: t.capacity for t in theatres}
+        x_names = list(summary.keys())
+        y_capacities = list(summary.values())
+
+        plt.figure(figsize=(8, 6))
+        plt.bar(x_names, y_capacities, color="blue", width=0.4)
         plt.title("Theatres/Capacities")
         plt.xlabel("Theatre")
         plt.ylabel("Capacity")
-        return plt
+
+        # Make sure the folder exists
+        output_dir = os.path.join('static', 'images')
+        os.makedirs(output_dir, exist_ok=True)  # ✅ This prevents the FileNotFoundError
+
+        output_path = os.path.join(output_dir, 'theatre_summary.jpeg')
+        plt.savefig(output_path)
+        plt.close()
+
+        return output_path
