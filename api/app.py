@@ -1,23 +1,10 @@
-import sys
-from pathlib import Path
-from flask import Flask
+# api/app.py
 
-# Set absolute paths
-BASE_DIR = Path(__file__).parent.parent
-sys.path.append(str(BASE_DIR))
+from flask import Flask
+from app import app
 
 app = Flask(__name__)
 
-# Basic test route
-@app.route('/health')
-def health_check():
-    return {"status": "ok"}
-
-# Vercel handler
-def handler(event, context):
-    return app({
-        'REQUEST_METHOD': event['httpMethod'],
-        'PATH_INFO': event['path'],
-        'QUERY_STRING': event.get('queryStringParameters', {}),
-        'wsgi.input': event.get('body', '')
-    }, lambda status, headers: None)
+@app.route('/')
+def hello():
+    return 'Flask on Vercel!'
