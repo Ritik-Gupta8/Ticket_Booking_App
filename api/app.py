@@ -1,13 +1,7 @@
 # api/app.py
+from app import app  # Import your main Flask app from root
 
-from flask import Flask
-# api/app.py
-
-from app import app as application  # Import the existing Flask app from root and expose it as `application`
-
-
-app = Flask(__name__)
-
-@app.route('/')
-def hello():
-    return 'Flask on Vercel!'
+# Vercel requires a WSGI handler
+def handler(request):
+    with app.app_context():
+        return app(request)
