@@ -3,4 +3,3 @@ Werkzeug==2.2.3
 Flask-SQLAlchemy==3.0.5
 SQLAlchemy==2.0.19
 python-dotenv==1.0.0
-vercel-python
