@@ -1,7 +1,9 @@
-# api/app.py
-from app import app  # Import your main Flask app from root
+from app import app
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
-# Vercel requires a WSGI handler
-def handler(request):
+# Vercel-compatible WSGI application
+application = DispatcherMiddleware(app)
+
+def handler(event, context):
     with app.app_context():
-        return app(request)
+        return application(event, context)
