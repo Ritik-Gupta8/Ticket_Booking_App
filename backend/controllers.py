@@ -189,10 +189,10 @@ def book_ticket(uid,sid,name):
 
     return render_template("book_ticket.html",uid=uid,sid=sid,name=name,tname=theatre.name,sname=show.name,available_seats=available_seats,tktprice=show.tkt_price)
 
-@app.route('/admin_summary')
-def admin_summary():
+@app.route("/admin_summary/<name>")
+def admin_summary(name):
     get_theatres_summary()  # ✅ no need to store return value or call savefig again
-    return render_template('admin_summary.html')
+    return render_template('admin_summary.html', name = name)
 
 
 

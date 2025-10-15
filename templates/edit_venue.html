@@ -1,31 +1,53 @@
-{%extends "admin_layout.html"%} <!--Inherited all features-->
-{%block content%}
-        {%if venue%}
-            <div class="center"><h3> Edit venue </h3></div>
-            <form action="/edit_venue/{{venue.id}}/{{name}}" method="POST">
-            <div class="input_form">
-                <div class="mb-3">
-                    <label for="tname" class="form-label">Name</label>
-                    <input type="text" class="form-control" name="tname"id="tname" value="{{venue.name}}">
-                </div>
-                <div class="mb-3">
-                    <label for="location" class="form-label">Location</label>
-                    <input type="text" class="form-control" name="location"id="location" value="{{venue.location}}">
-                </div>
-                <div class="mb-3">
-                    <label for="pincode" class="form-label">Pincode</label>
-                    <input type="number" class="form-control" name="pincode" id="pincode" value="{{venue.pincode}}">
-                </div>
-                <div class="mb-3">
-                    <label for="capacity" class="form-label">Capacity</label>
-                    <input type="number" class="form-control" name="capacity" id="capacity" value="{{venue.capacity}}">
-                </div>
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <a href ="/delete_venue/{{venue.id}}/{{name}}" type="button" class="btn btn-danger"> Delete</a>
-                    <a href ="/admin/{{name}}" type="button" class="btn btn-primary"> Cancel</a>
-                </div>
-            </form>
-            </div>
-        {%endif%}
-{%endblock%}
+{% extends "admin_layout.html" %}
+{% set hide_nav = True %}
+{% block content %}
+<div class="container py-5 text-light">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold text-cyan-400 tracking-wide">🏟️ Edit Venue</h2>
+    <p class="text-muted">Modify venue details below and save your changes</p>
+  </div>
+
+  {% if venue %}
+  <form action="/edit_venue/{{venue.id}}/{{name}}" method="POST"
+        class="mx-auto p-4 rounded-4 shadow-lg"
+        style="max-width: 600px; background: linear-gradient(145deg, #111, #1b1b1b); border: 1px solid rgba(255,255,255,0.08);">
+
+    <div class="mb-3">
+      <label for="tname" class="form-label text-info fw-semibold">Venue Name</label>
+      <input type="text" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm"
+             name="tname" id="tname" value="{{venue.name}}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="location" class="form-label text-info fw-semibold">Location</label>
+      <input type="text" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm"
+             name="location" id="location" value="{{venue.location}}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="pincode" class="form-label text-info fw-semibold">Pincode</label>
+      <input type="number" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm"
+             name="pincode" id="pincode" value="{{venue.pincode}}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="capacity" class="form-label text-info fw-semibold">Capacity</label>
+      <input type="number" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm"
+             name="capacity" id="capacity" value="{{venue.capacity}}" required>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+      <button type="submit" class="btn btn-info text-dark fw-semibold px-4 rounded-pill shadow-sm transition-all duration-300 hover:bg-cyan-400 hover:scale-105">
+        Save
+      </button>
+      <a href="/delete_venue/{{venue.id}}/{{name}}" class="btn btn-danger fw-semibold px-4 rounded-pill shadow-sm transition-all duration-300 hover:scale-105">
+        Delete
+      </a>
+      <a href="/admin/{{name}}" class="btn btn-outline-light fw-semibold px-4 rounded-pill shadow-sm transition-all duration-300 hover:bg-gray-700 hover:scale-105">
+        Cancel
+      </a>
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

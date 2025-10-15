@@ -1,33 +1,54 @@
-{%extends "admin_layout.html"%} <!--Inherited all features-->
-{%block content%}
-            <div class="center"><h3> Add Show </h3></div>
-            <form action="#" method="POST">
-            <div class="input_form">
-                <div class="mb-3">
-                    <label for="v_id" class="form-label">Venue ID</label>
-                    <input type="number" class="form-control" name="v_id"id="v_id" value="{{venue_id}}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" name="name"id="name" placeholder="movie_name">
-                </div>
-                <div class="mb-3">
-                    <label for="tags" class="form-label">Tags</label>
-                    <input type="text" class="form-control" name="tags"id="tags" placeholder="genre">  
-                </div>
-                <div class="mb-3">
-                    <label for="tkt_price" class="form-label">Ticket Price</label>
-                    <input type="number" class="form-control" name="tkt_price" id="tkt_price" placeholder="0">
-                </div>
-                <div class="mb-3">
-                    <label for="date_time" class="form-label">Date and Time</label>
-                    <input type="datetime-local" class="form-control" name="date_time" id="date_time" placeholder="00:00">
-                </div>
-                
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <a href ="/admin/{{name}}" type="button" class="btn btn-primary"> Cancel</a>
-                </div>
-            </form>
-            </div>
-{%endblock%}
+{% extends "admin_layout.html" %}
+{% set hide_nav = True %}
+{% block content %}
+<div class="container py-5 text-light">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold text-cyan-400 tracking-wide">🎥 Add New Show</h2>
+    <p class="text-muted">Fill in the details below to schedule a new movie show</p>
+  </div>
+
+  <form action="#" method="POST"
+    class="mx-auto p-4 rounded-4 shadow-lg"
+    style="max-width: 600px; background: linear-gradient(145deg, #111, #1b1b1b); border: 1px solid rgba(255,255,255,0.08);">
+
+    <div class="mb-3">
+      <label for="v_id" class="form-label text-info fw-semibold">Venue ID</label>
+      <input type="number" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm focus:ring-2 focus:ring-cyan-400"
+        name="v_id" id="v_id" value="{{venue_id}}" readonly>
+    </div>
+
+    <div class="mb-3">
+      <label for="name" class="form-label text-info fw-semibold">Show Name</label>
+      <input type="text" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm focus:ring-2 focus:ring-cyan-400"
+        name="name" id="name" placeholder="Enter show name" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="tags" class="form-label text-info fw-semibold">Tags</label>
+      <input type="text" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm focus:ring-2 focus:ring-cyan-400"
+        name="tags" id="tags" placeholder="Enter genres" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="tkt_price" class="form-label text-info fw-semibold">Ticket Price</label>
+      <input type="number" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm focus:ring-2 focus:ring-cyan-400"
+        name="tkt_price" id="tkt_price" placeholder="Enter amount" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="date_time" class="form-label text-info fw-semibold">Date & Time</label>
+      <input type="datetime-local" class="form-control bg-dark text-light border-0 rounded-3 shadow-sm focus:ring-2 focus:ring-cyan-400"
+        name="date_time" id="date_time" required>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+      <button type="submit" class="btn btn-info text-dark fw-semibold px-4 rounded-pill shadow-sm transition-all duration-300 hover:bg-cyan-400 hover:scale-105">
+        Submit
+      </button>
+      <a href="/admin/{{name}}" class="btn btn-outline-light fw-semibold px-4 rounded-pill transition-all duration-300 hover:bg-gray-700 hover:scale-105">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

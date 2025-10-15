@@ -1,47 +1,4 @@
-*{ 
-margin: 0px;
-}
 
-.my_container{
-    border: 2px solid black;
-}
-
-.my_panel{
-    width: 80%;
-    margin: auto;
-    height: auto;
-    border: 1px dashed black;
-
-}
-
-.input_form{
-    border: 1px solid blue;
-    width: 600px;
-    height: 500px;
-    margin: auto;
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 16px;
-    text-align: justify;
-
-}
-
-.outer_box{
-    border: 1px solid rgb(238, 121, 4);
-    margin-top:20px;
-    margin: auto;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px; 
-
-}
-
-.center{
-    text-align: center;
-    margin: auto;
-    color:rgb(136, 7, 116);
-}
 
 .err_msg{
     text-align: center;
@@ -49,11 +6,24 @@ margin: 0px;
     color:rgb(180, 0, 39);
 }
 
-.navbar_text_div{
-    font-size: larger;
-    margin-left: 20px;
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 25px rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 255, 255, 0.05);
+}
+.btn:hover {
+  transform: scale(1.05);
 }
 
-#grad {
-    background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1));
-  }
+input:focus {
+  outline: none !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+  transition: all 0.3s ease-in-out;
+}
+.btn:hover {
+  transform: scale(1.05);
+  transition: 0.3s ease;
+}
