@@ -1,17 +1,104 @@
-{%extends "admin_layout.html"%} <!--Inherited all features-->
-{%block content%}
-                <div class="container">
-                    <div class="row">
-                        <div class="col">
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                              <h5 class="card-title">Summary</h5>
-                              <h6 class="card-subtitle mb-2 text-muted">Theatres/Capacities</h6>
-                              <img src="{{ url_for('static', filename='images/theatre_summary.jpeg') }}" width="200" height="200">
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-{%endblock%}
-   
+{% extends "admin_layout.html" %}
+{% block content %}
+<div class="container py-5 text-light">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold text-cyan-400 tracking-wide">📊 Admin Summary</h2>
+    <p class="text-muted">Overview of theatre performance and capacity</p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+
+    <!-- Theatre Capacity Chart -->
+    <div class="col-md-6">
+      <div class="card shadow-lg rounded-4 border-0" 
+           style="background: linear-gradient(145deg, #111, #1b1b1b); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="card-body text-center">
+          <!-- <h5 class="text-info fw-semibold mb-3">🎭 Theatre Capacities</h5> -->
+          <canvas id="capacityChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theatre Revenue Chart -->
+    <div class="col-md-6">
+      <div class="card shadow-lg rounded-4 border-0" 
+           style="background: linear-gradient(145deg, #111, #1b1b1b); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="card-body text-center">
+          <h5 class="text-info fw-semibold mb-3">💰 Revenue by Theatre</h5>
+          <canvas id="revenueChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  // 🎭 Data fetched from backend (capacity)
+    const theatreNames = JSON.parse('{{ theatre_names | tojson | safe }}');
+    const theatreCapacities = JSON.parse('{{ theatre_capacities | tojson | safe }}');
+
+  // 💰 Placeholder revenue data (replace with actual values later)
+//   const theatreRevenues = {{ theatre_revenues | safe if theatre_revenues is defined else [10000, 12000, 8000, 15000, 11000] }};
+    const theatreRevenues = JSON.parse('{{ theatre_revenues | tojson | safe }}');
+
+  // 🎨 Color palette for charts
+  const chartColors = [
+    "#00ffff", "#ff4ecd", "#22c55e", "#facc15", "#f97316", "#3b82f6", "#a855f7"
+  ];
+
+  // 🎭 Bar Chart for Capacities
+  const ctx1 = document.getElementById('capacityChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: theatreNames,
+      datasets: [{
+        label: 'Capacity',
+        data: theatreCapacities,
+        backgroundColor: chartColors,
+        borderColor: "rgba(255,255,255,0.2)",
+        borderWidth: 1,
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: '🎭Theatre Capacities', color: '#00ffff', font: { size: 18 } }
+      },
+      scales: {
+        x: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+      }
+    }
+  });
+
+  // 💰 Pie Chart for Revenue
+  const ctx2 = document.getElementById('revenueChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: theatreNames,
+      datasets: [{
+        label: 'Revenue',
+        data: theatreRevenues,
+        backgroundColor: chartColors,
+        borderColor: "rgba(0,0,0,0.4)",
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#ddd' } },
+        title: { display: true, text: 'Revenue by Theatre', color: '#00ffff', font: { size: 18 } }
+      }
+    }
+  });
+</script>
+{% endblock %}

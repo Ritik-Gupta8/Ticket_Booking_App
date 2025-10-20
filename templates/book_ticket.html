@@ -1,47 +1,96 @@
-{%extends "user_layout.html"%} <!--Inherited all features-->
-{%block content%}
+{% extends "user_layout.html" %}
+{% set hide_nav = True %}
+{% block content %}
 <script>
-    function calculateTotalPrice(tktprice){
-        document.getElementById("total_price").value=tktprice*document.getElementById("no_of_tickets").value;
-    }
+  function calculateTotalPrice(tktprice) {
+    const noTickets = document.getElementById("no_of_tickets").value || 0;
+    document.getElementById("total_price").value = (tktprice * noTickets).toFixed(2);
+  }
 </script>
-            <div class="center"><h3> Book Ticket </h3></div>
-            <div class="center"><h4>Venue : {{tname}}, Movie : {{sname}}</h4></div>
-            <div class="center"><h5>Ticket Price : {{tktprice}}</h5></div>
 
-            <form action="/book_ticket/{{uid}}/{{sid}}/{{name}}" method="POST">
-            <div class="input_form">
-                <div class="mb-3">
-                    <label for="uid" class="form-label">User ID</label>
-                    <input type="number" class="form-control" name="uid"id="uid" value="{{uid}}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="sid" class="form-label">Show ID</label>
-                    <input type="number" class="form-control" name="sid"id="sid" value="{{sid}}" readonly>
-                </div>
-                <div class="mb-3">
-                    <label for="available_seats" class="form-label">Available Seats</label>
-                    <input type="number" class="form-control" name="available_seats"id="available_seats" value="{{available_seats}}" readonly>
-                </div>
-                {%if available_seats == 0%}
-                <div class="mb-3">
-                    <label class="form-label">No seats are available!!!</label>
-                </div>
-                {%else%}
-                <div class="mb-3">
-                    <label for="no_of_tickets" class="form-label">No. of_tickets</label>
-                    <input type="number" class="form-control" name="no_of_tickets"id="no_of_tickets" value="0" onblur="calculateTotalPrice('{{tktprice}}')">
-                </div>
-                {%endif%}
-                <div class="mb-3">
-                    <label for="total_price" class="form-label">Total_price</label>
-                    <input type="number" class="form-control" name="total_price"id="total_price" readonly>
-                </div>
-                
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <a href ="/user/{{name}}" type="button" class="btn btn-primary"> Cancel</a>
-                </div>
-            </form>
-            </div>
-{%endblock%}
+<div class="container py-5 text-light">
+  <div class="text-center mb-4">
+    <h2 class="fw-bold text-cyan-400 tracking-wide">🎟️ Book Ticket</h2>
+    <p class="text-muted">Select number of tickets to book your show</p>
+  </div>
+
+  <div class="mx-auto p-4 rounded-4 shadow-lg"
+       style="max-width: 600px; background: linear-gradient(145deg, #111, #1b1b1b); border: 1px solid rgba(255,255,255,0.08);">
+
+    <div class="text-center mb-3">
+      <h4 class="text-info fw-semibold">Venue: {{ tname }}</h4>
+      <h5 class="text-secondary">🎬 {{ sname }}</h5>
+      <h6 class="text-muted">💰 Ticket Price: ₹{{ tktprice }}</h6>
+    </div>
+
+    {% if error %}
+      <div class="alert alert-danger text-center fw-semibold py-2">{{ error }}</div>
+    {% endif %}
+
+    <form action="/book_ticket/{{ id }}/{{ sid }}/{{ name }}" method="POST">
+      <!-- User ID -->
+      <div class="mb-3">
+        <label for="uid" class="form-label text-info fw-semibold">User ID</label>
+        <input type="number" class="form-control bg-secondary text-white border-0 rounded-3 shadow-sm"
+               name="uid" id="uid" value="{{ id }}" readonly>
+      </div>
+
+      <!-- Show ID -->
+      <div class="mb-3">
+        <label for="sid" class="form-label text-info fw-semibold">Show ID</label>
+        <input type="number" class="form-control bg-secondary text-white border-0 rounded-3 shadow-sm"
+               name="sid" id="sid" value="{{ sid }}" readonly>
+      </div>
+
+      <!-- Available Seats -->
+      <div class="mb-3">
+        <label for="available_seats" class="form-label text-info fw-semibold">Available Seats</label>
+        <input type="number" class="form-control bg-secondary text-white border-0 rounded-3 shadow-sm"
+               name="available_seats" id="available_seats" value="{{ available_seats }}" readonly>
+      </div>
+
+      {% if available_seats == 0 %}
+        <div class="alert alert-warning text-center fw-semibold">🚫 No seats are available!</div>
+      {% else %}
+        <!-- Number of Tickets -->
+        <div class="mb-3">
+          <label for="no_of_tickets" class="form-label text-info fw-semibold">No. of Tickets</label>
+          <input type="number"
+                 class="form-control bg-dark text-light border-0 rounded-3 shadow-sm focus:ring-2 focus:ring-cyan-400"
+                 name="no_of_tickets"
+                 id="no_of_tickets"
+                 min="1"
+                 max="{{ available_seats }}"
+                 value="0"
+                 oninput="calculateTotalPrice('{{ tktprice }}')"
+                 required>
+        </div>
+      {% endif %}
+
+      <!-- Total Price -->
+      <div class="mb-3">
+        <label for="total_price" class="form-label text-info fw-semibold">Total Price (₹)</label>
+        <input type="number" class="form-control bg-secondary text-white border-0 rounded-3 shadow-sm"
+               name="total_price" id="total_price" value="0" readonly>
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-between mt-4">
+        <button type="submit"
+                class="btn btn-info text-dark fw-semibold px-4 rounded-pill shadow-sm transition-all duration-300 hover:bg-cyan-400 hover:scale-105">
+          Confirm Booking
+        </button>
+        <a href="/user/{{ id }}/{{ name }}"
+           class="btn btn-outline-light fw-semibold px-4 rounded-pill transition-all duration-300 hover:bg-gray-700 hover:scale-105">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Initialize total price on page load
+  calculateTotalPrice('{{ tktprice }}');
+</script>
+{% endblock %}

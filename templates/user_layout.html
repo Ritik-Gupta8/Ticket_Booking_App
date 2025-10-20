@@ -1,38 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link rel="stylesheet" href="/static/styles/main.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <title>User Dashboard</title>
-    </head>
-    <body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Dashboard</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous"
+  />
+
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+  />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/styles/main.css" />
+
+  <style>
+    /* ===== Dark Theme Base ===== */
+    body {
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      color: #f1f1f1;
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #00bcd4;
+      text-shadow: 0 0 15px rgba(0, 188, 212, 0.8);
+      text-align: center;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      animation: fadeInDown 1s ease;
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 188, 212, 0.25);
+      margin: 20px auto;
+      padding: 0.6rem 1.5rem;
+      max-width: 1200px;
+      animation: fadeInUp 1.2s ease;
+    }
+
+    .navbar-nav .nav-link {
+      color: #f1f1f1 !important;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-right: 20px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #00bcd4 !important;
+    }
+
+    .navbar-nav .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0%;
+      height: 2px;
+      background-color: #00bcd4;
+      transition: width 0.3s ease-in-out;
+      border-radius: 2px;
+    }
+
+    .navbar-nav .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .form-control {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border-radius: 25px;
+      padding-left: 15px;
+    }
+
+    .form-control::placeholder {
+      color: #bbb;
+    }
+
+    .btn-outline-success {
+      color: #00bcd4;
+      border-color: #00bcd4;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-success:hover {
+      background: linear-gradient(135deg, #00bcd4, #2196f3);
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    .navbar_text_div {
+      font-weight: 500;
+      color: #00bcd4;
+      text-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
+      letter-spacing: 0.5px;
+    }
+
+    .my_panel {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+    {% if not hide_nav %}
         <div class="my_container">
-            <div class="center"><h1>My Cine View</h1></div>
-            <div class="my_panel">
-                <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#13fdfded">
-                    <div class="container-fluid">
-                        <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarText">
-                            <ul class="navbar-nav mb-2 mb-lg-0">
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">Profile</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Bookings</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/login">Logout</a>
-                                </li>
-                            </ul>
-                            <span class="navbar-text">
-                                Welcome to {{name}}
-                            </span>
-                        </div>
-                    </div>
-                </nav>
-                {%block content%}
-                <!-- This is from child html -->
-                {%endblock%}
+        <div class="center">
+        <h1>Your CineVerse Dashboard</h1>
+        </div>
+
+        <div class="my_panel">
+        {% if not hide_nav %}
+        <nav class="navbar navbar-expand-lg">
+            <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarText">
+
+            <!-- Left Navigation -->
+            <ul class="navbar-nav mb-2 mb-lg-0 d-flex align-items-center">
+                <li class="nav-item">
+                <a class="nav-link active" href="/user/{{ user_info.id }}/{{name}}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="/user_bookings/{{ user_info.id }}/{{name}}">
+                    <i class="bi bi-ticket-perforated-fill"></i> Bookings
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="/user_summary/{{ user_info.id }}/{{name}}">
+                    <i class="bi bi-bar-chart-fill"></i> Summary
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="/login">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+                </li>
+            </ul>
+
+                <!-- Center Search -->
+                <form class="d-flex mx-4" action="/search_user/{{ user_info.id }}/{{ name }}" method="POST">
+                    <input
+                        class="form-control me-2"
+                        type="search"
+                        name="query"
+                        placeholder="Search shows..."
+                        aria-label="Search"
+                    />
+                    <button class="btn btn-outline-success" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+
+
+            <!-- Right Welcome -->
+            <span class="navbar_text_div">
+                Welcome, <strong>{{name}}</strong>
+            </span>
             </div>
-        </div>   
-    </body>
+        </nav>
+        {% endif %}
+    {% endif %}
+    
+
+      {% block content %}
+      <!-- Content to be injected by child templates -->
+      {% endblock %}
+    </div>
+  </div>
+</body>
 </html>

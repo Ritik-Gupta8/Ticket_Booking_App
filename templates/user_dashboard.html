@@ -1,31 +1,58 @@
-{%extends "user_layout.html"%} <!--Inherited all features-->
-{%block content%}
-        {%if theatres%}
-            {%for theatre in theatres%}
-                {%if theatre.shows%}
-                    <div class="outer_box">
-                        <h4>{{ theatre.name }}</h4>
-                        <div class="container">
-                            <div class="row">
-                                {%for show in theatre.shows%}
-                                    {%if show.date_time >= dt_time_now%}
-                                        <div class="col">
-                                            <div class="card" style="width: 18rem;">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">{{show.name}}</h5>
-                                                    <h6 class="card-subtitle mb-2 text-muted">{{show.tags}}, Show Time:{{show.date_time}}</h6>
-                                                    <a href ="/book_ticket/{{uid}}/{{show.id}}/{{name}}" class="btn btn-outline-primary">Book</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {%endif%}
-                                {%endfor%}
-                            </div>           
-                        </div>
-                    </div>
-                {%endif%}
-            {%endfor%}
-        {%else%}  
-            <h3 class="center">Sorry, no theatres available!!!</h3> 
-        {%endif%}
-{%endblock%}
+{% extends "user_layout.html" %}
+{% block content %}
+<div class="container py-5">
+  {% if theatres %}
+  <div class="row justify-content-center">
+    {% for theatre in theatres %}
+    <div class="col-md-4 col-sm-6 mb-4">
+      <div class="card bg-dark text-light shadow-lg border-0 rounded-3 transform transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
+        style="background: linear-gradient(145deg, #121212, #1f1f1f); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="card-body">
+          <h5 class="card-title mb-2 text-info fw-bold">
+            🎬 {{ theatre.name }}
+          </h5>
+          <h6 class="card-subtitle mb-3 text-muted">
+            📍 {{ theatre.location }}
+          </h6>
+
+          {% if theatre.shows %}
+          <div class="table-responsive">
+            <table class="table table-dark table-sm table-hover rounded">
+              <thead class="text-info">
+                <tr>
+                  <th>Name</th>
+                  <th>Date & Time</th>
+                  <th>Book</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for show in theatre.shows %}
+                {% if show.date_time >= dt_time_now %}
+                <tr class="hover:bg-zinc-800 transition">
+                  <td>{{ show.name }}</td>
+                  <td>{{ show.date_time.strftime('%d %b %Y, %I:%M %p') }}</td>
+                  <td>
+                    <a href="/book_ticket/{{id}}/{{show.id}}/{{name}}" 
+                      class="btn btn-outline-info btn-sm rounded-pill hover:bg-cyan-400 hover:text-black transition-all duration-300">
+                      🎟️ Book
+                    </a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-secondary">No shows available 🎥</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <h3 class="text-center text-secondary mt-5">No Theatres are currently available 😔</h3>
+  {% endif %}
+</div>
+{% endblock %}

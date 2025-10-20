@@ -11,7 +11,7 @@ def setup_app():
     db.init_app(app) #Flask app connected to db 
     app.app_context().push() # Direct access to other modules
     app.debug=True
-    print("Ticker show app is started..")
+    print("Ticker show app is started")
 
 setup_app()  
 

@@ -1,0 +1,43 @@
+{% extends "user_layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow p-4">
+    <h3 class="text-center mb-4">My Spending Summary</h3>
+
+    <canvas id="spendChart" height="120"></canvas>
+  </div>
+</div>
+
+<script>
+  const ctx = document.getElementById('spendChart');
+
+    const theatreNames = JSON.parse('{{ theatre_names | tojson | safe }}');
+    const spendAmounts = JSON.parse('{{ spend_amounts | tojson | safe }}');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: theatreNames,
+      datasets: [{
+        label: 'Total Spent (₹)',
+        data: spendAmounts,
+        backgroundColor: '#00BFFF',
+        borderColor: '#005A9C',
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      },
+      plugins: {
+        legend: { display: true, position: 'top' },
+        title: {
+          display: true,
+          text: 'Total Spend by Theatre'
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}
