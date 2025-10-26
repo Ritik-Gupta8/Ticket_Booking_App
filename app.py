@@ -20,3 +20,27 @@ from backend.controllers import *
 
 if __name__ =="__main__":
     app.run()
+
+
+# # Starting of the application
+# from flask import Flask
+# from backend.models import db
+
+# app = None  # global app variable
+
+# def setup_app():
+#     global app  # tell Python we want to modify the global variable
+#     app = Flask(__name__)
+#     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ticket_show.sqlite3"  # DB file
+#     db.init_app(app)  # connect Flask to db
+#     app.app_context().push()  # direct access to models etc.
+#     app.debug = True
+#     print("Ticket Show app is started")
+
+# setup_app()
+
+# from backend.controllers import *
+
+# if __name__ == "__main__":
+#     # 👇 Allow other devices on same Wi-Fi to access
+#     app.run(host="0.0.0.0", port=5000, debug=True)

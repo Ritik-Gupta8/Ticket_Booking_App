@@ -159,7 +159,20 @@ def admin_users(name):
     users = User_Info.query.filter_by(role=1).order_by(User_Info.total_spent.desc()).all()
     return render_template("user_details.html", name=name, users=users)
 
+@app.route("/admin_summary/<name>")
+def admin_summary(name):
+    theatres = Theatre.query.all()  # or your get_theatres()
+    theatre_names = [t.name for t in theatres]
+    theatre_capacities = [t.capacity for t in theatres]
+    theatre_revenues = [float(t.total_revenue or 0) for t in theatres]  # ✅ ensure numeric
 
+    return render_template(
+        "admin_summary.html",
+        name=name,
+        theatre_names=theatre_names,
+        theatre_capacities=theatre_capacities,
+        theatre_revenues=theatre_revenues
+    )
 
 
 #######################################################################################################################################################3
@@ -169,32 +182,56 @@ def admin_users(name):
 def user_dashboard(id, name):
     user_info = User_Info.query.get_or_404(id)
     theatres = get_theatres()
-
     dt_time_now = datetime.today().strftime("%Y-%m-%dT%H:%M")
     dt_time_now = datetime.strptime(dt_time_now, "%Y-%m-%dT%H:%M")
 
     return render_template("user_dashboard.html", id=id, name=name, user_info=user_info, theatres=theatres, dt_time_now=dt_time_now)
 
 @app.route("/search_user/<id>/<name>", methods=["GET", "POST"])
-def search_user(name, id):
+def search_user(id, name):
     user_info = User_Info.query.get_or_404(id)
 
     if request.method == "POST":
-        search_txt = request.form.get("query")  # Match input name from form
+        search_txt = request.form.get("query")
 
         if not search_txt:
             return redirect(url_for("user_dashboard", id=id, name=name))
-        by_venue = search_by_venue(search_txt)
-        by_location = search_by_location(search_txt)
-        by_show = Show.query.filter(Show.name.ilike(f"%{search_txt}%")).all()
-        if by_venue:
-            return render_template("user_dashboard.html", id=id, name=name, user_info=user_info, theatres=by_venue)
-        elif by_location:
-            return render_template("user_dashboard.html", id=id, name=name, user_info=user_info, theatres=by_location)
-        elif by_show:
-            return render_template("user_dashboard.html", id=id, name=name, user_info=user_info, shows=by_show)
+
+        # Search venue & location
+        matched_theatres = Theatre.query.filter(
+            (Theatre.name.ilike(f"%{search_txt}%")) |
+            (Theatre.location.ilike(f"%{search_txt}%"))
+        ).all()
+
+        # Search by show name
+        matched_shows = Show.query.filter(Show.name.ilike(f"%{search_txt}%")).all()
+
+        dt_time_now = datetime.today().strftime("%Y-%m-%dT%H:%M")
+        dt_time_now = datetime.strptime(dt_time_now, "%Y-%m-%dT%H:%M")
+
+        # ✅ If theatres found → show theatres
+        if matched_theatres:
+            return render_template("user_dashboard.html", 
+                                   id=id, name=name, 
+                                   user_info=user_info, 
+                                   theatres=matched_theatres,
+                                   dt_time_now=dt_time_now)
+
+        # ✅ If shows found → display theatres of those shows
+        if matched_shows:
+            # Extract theatres from shows
+            theatre_ids = {show.theatre_id for show in matched_shows}
+            theatres_for_shows = Theatre.query.filter(Theatre.id.in_(theatre_ids)).all()
+
+            return render_template("user_dashboard.html", 
+                                   id=id, name=name, 
+                                   user_info=user_info, 
+                                   theatres=theatres_for_shows,
+                                   dt_time_now=dt_time_now,
+                                   shows=matched_shows)
 
     return redirect(url_for("user_dashboard", id=id, name=name))
+
 
 @app.route("/book_ticket/<id>/<sid>/<name>", methods=["GET", "POST"])
 def book_ticket(id, sid, name):
@@ -242,6 +279,49 @@ def user_bookings(id, name):
 
 
 
+@app.route("/user_summary/<int:id>/<name>")
+def user_summary(id, name):
+    user = User_Info.query.get_or_404(id)
+
+    # 🎭 Spend per theatre
+    theatre_spend = (
+        db.session.query(Theatre.name, db.func.sum(Ticket.no_of_tickets * Show.tkt_price))
+        .join(Show, Show.theatre_id == Theatre.id)
+        .join(Ticket, Ticket.show_id == Show.id)
+        .filter(Ticket.user_id == user.id)
+        .group_by(Theatre.name)
+        .all()
+    )
+    theatre_names = [t[0] for t in theatre_spend]
+    spend_amounts = [float(t[1]) if t[1] else 0 for t in theatre_spend]
+
+    # 🏙️ Spend per city (Theatre.location)
+    city_spend = (
+        db.session.query(Theatre.location, db.func.sum(Ticket.no_of_tickets * Show.tkt_price))
+        .join(Show, Show.theatre_id == Theatre.id)
+        .join(Ticket, Ticket.show_id == Show.id)
+        .filter(Ticket.user_id == user.id)
+        .group_by(Theatre.location)
+        .all()
+    )
+    city_names = [c[0] for c in city_spend]
+    city_amounts = [float(c[1]) if c[1] else 0 for c in city_spend]
+
+    # 🧮 Total spend
+    total_spent = sum(spend_amounts)
+
+    return render_template(
+        "user_summary.html",
+        name=name,
+        user_info=user,
+        theatre_names=theatre_names,
+        spend_amounts=spend_amounts,
+        city_names=city_names,
+        city_amounts=city_amounts,
+        total_spent=total_spent
+    )
+
+
 #Other supportedd function
 def get_theatres():
     theatres=Theatre.query.all()
@@ -262,76 +342,3 @@ def get_venue(id):
 def get_show(id):
     show=Show.query.filter_by(id=id).first()
     return show
-
-
-# @app.route("/admin_summary/<name>")
-# def admin_summary(name):
-#     get_theatres_summary()  # ✅ no need to store return value or call savefig again
-#     return render_template('admin_summary.html', name = name)
-
-# import os
-# def get_theatres_summary():
-#     theatres = get_theatres()
-#     summary = {t.name: t.capacity for t in theatres}
-#     x_names = list(summary.keys())
-#     y_capacities = list(summary.values())
-
-#     plt.figure(figsize=(8, 6))
-#     plt.bar(x_names, y_capacities, color="blue", width=0.4)
-#     plt.title("Theatres/Capacities")
-#     plt.xlabel("Theatre")
-#     plt.ylabel("Capacity")
-
-#     # Make sure the folder exists
-#     output_dir = os.path.join('static', 'images')
-#     os.makedirs(output_dir, exist_ok=True)  # ✅ This prevents the FileNotFoundError
-
-#     output_path = os.path.join(output_dir, 'theatre_summary.jpeg')
-#     plt.savefig(output_path)
-#     plt.close()
-
-#     return output_path
-
-@app.route("/admin_summary/<name>")
-def admin_summary(name):
-    theatres = Theatre.query.all()  # or your get_theatres()
-    theatre_names = [t.name for t in theatres]
-    theatre_capacities = [t.capacity for t in theatres]
-    theatre_revenues = [float(t.total_revenue or 0) for t in theatres]  # ✅ ensure numeric
-
-    return render_template(
-        "admin_summary.html",
-        name=name,
-        theatre_names=theatre_names,
-        theatre_capacities=theatre_capacities,
-        theatre_revenues=theatre_revenues
-    )
-
-
-
-@app.route("/user_summary/<name>")
-def user_summary(name):
-    user = User_Info.query.filter_by(full_name=name).first()
-
-    if not user:
-        return "User not found", 404
-
-    # Aggregate total spend per theatre
-    theatre_spend = (
-        db.session.query(Theatre.name, db.func.sum(Ticket.no_of_tickets * Show.tkt_price))
-        .join(Show, Show.theatre_id == Theatre.id)
-        .join(Ticket, Ticket.show_id == Show.id)
-        .filter(Ticket.user_id == user.id)
-        .group_by(Theatre.name)
-        .all()
-    )
-
-    theatre_names = [t[0] for t in theatre_spend]
-    spend_amounts = [float(t[1]) if t[1] else 0 for t in theatre_spend]
-
-    return render_template(
-        "user_summary.html",
-        name=name,
-        theatre_names=theatre_names,
-        spend_amounts=spend_amounts
-    )

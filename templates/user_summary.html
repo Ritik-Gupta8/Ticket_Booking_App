@@ -1,41 +1,116 @@
 {% extends "user_layout.html" %}
+{% set hide_nav = True %}
 {% block content %}
-<div class="container mt-4">
-  <div class="card shadow p-4">
-    <h3 class="text-center mb-4">My Spending Summary</h3>
 
-    <canvas id="spendChart" height="120"></canvas>
+<style>
+  .glass-btn {
+    display: inline-block;
+    text-align: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    padding: 5px 15px;
+    border-radius: 30px;
+    background: rgba(0,255,255,0.15);
+    border: 1px solid rgba(0,255,255,0.4);
+    color: #00ffff;
+    backdrop-filter: blur(6px);
+    text-decoration: none;
+    font-weight: 600;
+    transition: .3s;
+  }
+  .glass-btn:hover {
+    background: rgba(0,255,255,0.35);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 767px) {
+    .summary-card {
+      margin-bottom: 20px !important;
+    }
+  }
+</style>
+
+<a href="/user/{{ user_info.id }}/{{name}}" class="glass-btn">⬅ Back to Dashboard</a>
+
+<div class="container py-3 text-light">
+
+  <div class="text-center mb-3">
+    <h2 class="fw-bold" style="color:#00ffff;">💸 Your Spending Summary</h2>
+    <p class="text-muted">Track how much you've spent across cities and theatres</p>
+  </div>
+
+  <h4 class="text-center mb-4">
+    <span class="px-4 py-2 rounded-pill" 
+    style="background: rgba(0,255,255,0.1); border:1px solid rgba(0,255,255,0.3); color:#00ffff;">
+      Total Spent: ₹{{ total_spent }}
+    </span>
+  </h4>
+
+  <div class="row g-4 justify-content-center">
+
+    <!-- Spending by City -->
+    <div class="col-md-5 summary-card">
+      <div class="card shadow-lg rounded-4 border-0"
+          style="background: linear-gradient(145deg, #111, #1b1b1b); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="card-body text-center">
+          <h5 class="mb-3" style="color:#00ffff;">🏙️ Spending by City</h5>
+          <canvas id="cityChart" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spending by Theatre -->
+    <div class="col-md-5 summary-card">
+      <div class="card shadow-lg rounded-4 border-0"
+          style="background: linear-gradient(145deg, #111, #1b1b1b); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="card-body text-center">
+          <h5 class="mb-3" style="color:#00ffff;">🎭 Spending by Theatre</h5>
+          <canvas id="theatreChart" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-  const ctx = document.getElementById('spendChart');
+  const cityNames = JSON.parse('{{ city_names | tojson | safe }}');
+  const cityAmounts = JSON.parse('{{ city_amounts | tojson | safe }}');
+  const theatreNames = JSON.parse('{{ theatre_names | tojson | safe }}');
+  const spendAmounts = JSON.parse('{{ spend_amounts | tojson | safe }}');
 
-    const theatreNames = JSON.parse('{{ theatre_names | tojson | safe }}');
-    const spendAmounts = JSON.parse('{{ spend_amounts | tojson | safe }}');
+  // pastel neon color palette
+  const barColors = [
+    "#FF4ECD", "#00E5FF", "#7CFF6A", "#FFB347", "#9D4DFF", "#FF5E45", "#FFD93D"
+  ];
 
-  new Chart(ctx, {
+  // City Chart
+  new Chart(document.getElementById('cityChart'), {
+    type: 'doughnut',
+    data: { labels: cityNames, datasets: [{ data: cityAmounts, backgroundColor: barColors }] },
+    options: {
+      plugins: { legend: { position: 'bottom', labels: { color: "#ddd" } } }
+    }
+  });
+
+  // Theatre Bar Chart
+  new Chart(document.getElementById('theatreChart'), {
     type: 'bar',
-    data: {
+    data: { 
       labels: theatreNames,
       datasets: [{
-        label: 'Total Spent (₹)',
         data: spendAmounts,
-        backgroundColor: '#00BFFF',
-        borderColor: '#005A9C',
-        borderWidth: 1,
+        backgroundColor: barColors.slice(0, spendAmounts.length),
+        borderRadius: 7
       }]
     },
     options: {
+      plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true }
-      },
-      plugins: {
-        legend: { display: true, position: 'top' },
-        title: {
-          display: true,
-          text: 'Total Spend by Theatre'
-        }
+        x: { ticks: { color: "#ccc" }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.08)" } }
       }
     }
   });
